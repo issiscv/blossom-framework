@@ -1,27 +1,18 @@
 package org.blossomframework.core;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ApplicationContextTest {
 
-    private ApplicationContext applicationContext;
-
-    @BeforeEach
-    void beforeEach() {
-        applicationContext = new ApplicationContext(Foo.class);
-    }
-
     @Test
     void ApplicationContextTest() {
-        Foo foo = (Foo) applicationContext.getBean("Foo");
-        Bar bar = (Bar) applicationContext.getBean("bar");
+        ApplicationContext applicationContext = new ApplicationContext(Foo.class);
 
         assertEquals(applicationContext.getBeans().size(), 2);
-        assertEquals(foo.getClass().getSimpleName(), "Foo");
-        assertEquals(bar.getClass().getSimpleName(), "Bar");
+        assertEquals(applicationContext.getBean("foo").getClass(), Foo.class);
+        assertEquals(applicationContext.getBean("bar").getClass(), Bar.class);
     }
 
     @Configuration

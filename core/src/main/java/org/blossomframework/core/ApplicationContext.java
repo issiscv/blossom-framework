@@ -4,49 +4,63 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-// TODO: 2023-11-27 get generic type
-// TODO: 2023-11-27 DI
+// bean 의 조회 가능(type 지정 가능)
 public class ApplicationContext {
 
-    private Map<String, Object> beans = new HashMap<>();
+	private Map<String, BeanDefinition> beanDefinitions = new HashMap<>();
 
-    public ApplicationContext() {
-    }
+	public ApplicationContext() {
+	}
 
-    public ApplicationContext(Class<?>... configClasses) {
-        for (Class<?> configClass : configClasses) {
-            processConfigClass(configClass);
-        }
-    }
+	public ApplicationContext(Class<?>... configClasses) {
+		for (Class<?> configClass : configClasses) {
+			processConfigClass(configClass);
+		}
+	}
 
-    private void processConfigClass(Class<?> configClass) {
-        try {
-            if (configClass.isAnnotationPresent(org.blossomframework.core.Configuration.class)) {
-                Object configInstance = configClass.getDeclaredConstructor().newInstance();
+	private void processConfigClass(Class<?> configClass) {
+		try {
+			if (configClass.isAnnotationPresent(org.blossomframework.core.Configuration.class)) {
+				Object configInstance = configClass.getDeclaredConstructor().newInstance();
 
-                beans.put(getBeanName(configInstance), configInstance);
-                for (Method method : configClass.getDeclaredMethods()) {
-                    if (method.isAnnotationPresent(Bean.class)) {
-                        Object bean = method.invoke(configInstance);
-                        beans.put(method.getName(), bean);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+				String configurationBeanName = resolveConfigurationBeanName(configInstance);
 
-    private String getBeanName(Object bean) {
-        String simpleName = bean.getClass().getSimpleName();
-        return simpleName.substring(0, 1).toLowerCase() + simpleName.substring(1);
-    }
+				beanDefinitions.put(configurationBeanName, new BeanDefinition(configurationBeanName, configClass, configInstance));
 
-    public Object getBean(String name) {
-        return beans.get(name);
-    }
+				for (Method method : configClass.getDeclaredMethods()) {
+					if (method.isAnnotationPresent(Bean.class)) {
+						String methodBeanName = method.getName();
+						beanDefinitions.put(methodBeanName, new BeanDefinition(methodBeanName, method.getDeclaringClass(), method.invoke(configInstance)));
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-    public Map<String, Object> getBeans() {
-        return beans;
-    }
+	private String resolveConfigurationBeanName(Object bean) {
+		String simpleName = bean.getClass().getSimpleName();
+		return simpleName.substring(0, 1).toLowerCase() + simpleName.substring(1);
+	}
+
+	public Object getBean(String name) {
+		return getBeanDefinition(name).getTargetBean();
+
+	}
+
+	public <T> T getBean(String name, Class<T> requiredType) {
+		return requiredType.cast(getBeanDefinition(name).getTargetBean());
+
+	}
+
+	private BeanDefinition getBeanDefinition(String name) {
+		BeanDefinition beanDefinition = beanDefinitions.get(name);
+		if (beanDefinition == null) {
+			throw new RuntimeException("No bean named '" + name + "' is defined");
+		}
+		return beanDefinition;
+	}
+
+
 }

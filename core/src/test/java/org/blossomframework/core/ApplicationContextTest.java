@@ -2,30 +2,60 @@ package org.blossomframework.core;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ApplicationContextTest {
 
-    @Test
-    void ApplicationContextTest() {
-        ApplicationContext applicationContext = new ApplicationContext(Foo.class);
+	@Test
+	void getBeanTypeTest() {
+		ApplicationContext applicationContext = new ApplicationContext(Foo.class);
 
-        assertEquals(applicationContext.getBeans().size(), 2);
-        assertEquals(applicationContext.getBean("foo").getClass(), Foo.class);
-        assertEquals(applicationContext.getBean("bar").getClass(), Bar.class);
-    }
+		String foo = "foo";
+		String bar = "bar";
 
-    @Configuration
-    static class Foo {
+		assertNotNull(applicationContext.getBean(foo, Foo.class));
+		assertNotNull(applicationContext.getBean(bar, Bar.class));
 
-        @Bean
-        public Bar bar() {
-            return new Bar();
-        }
+		assertEquals(bar, applicationContext.getBean(bar, Bar.class).getBar());
 
-    }
+	}
 
-    static class Bar {
-    }
+	@Test
+	void getBeanTest() {
+		ApplicationContext applicationContext = new ApplicationContext(Foo.class);
+
+		Object foo = applicationContext.getBean("foo");
+		Object bar = applicationContext.getBean("bar");
+
+		assertInstanceOf(Foo.class, foo);
+		assertInstanceOf(Bar.class, bar);
+	}
+
+
+	@Configuration
+	static class Foo {
+
+		@Bean
+		public Bar bar() {
+			return new Bar("bar");
+		}
+
+	}
+
+	static class Bar {
+		private String bar;
+
+		public Bar(String bar) {
+			this.bar = bar;
+		}
+
+		public String getBar() {
+			return bar;
+		}
+
+		public void setBar(String bar) {
+			this.bar = bar;
+		}
+	}
 
 }

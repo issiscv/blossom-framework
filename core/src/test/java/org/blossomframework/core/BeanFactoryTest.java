@@ -13,26 +13,32 @@ class BeanFactoryTest {
 
 	@Test
 	void getBeanByNameTest() {
-		assertNotNull(beanFactory.getBean(foo));
-		assertInstanceOf(Foo.class, beanFactory.getBean(foo));
+		Object fooBean = beanFactory.getBean(foo);
+		assertNotNull(fooBean);
+		assertInstanceOf(Foo.class, fooBean);
 
-		assertNotNull(beanFactory.getBean(bar));
-		assertInstanceOf(Bar.class, beanFactory.getBean(bar));
+		Object barBean = beanFactory.getBean(bar);
+		assertNotNull(barBean);
+		assertInstanceOf(Bar.class, barBean);
 
-		assertNotNull(beanFactory.getBean(baz));
-		assertInstanceOf(Baz.class, beanFactory.getBean(baz));
+		Object bazBean = beanFactory.getBean(baz);
+		assertNotNull(bazBean);
+		assertInstanceOf(Baz.class, bazBean);
 	}
 
 	@Test
 	void getBeanByNameAndTypeTest() {
-		assertNotNull(beanFactory.getBean(foo, Foo.class));
-		assertInstanceOf(Foo.class, beanFactory.getBean(foo, Foo.class));
+		Foo fooBean = beanFactory.getBean(foo, Foo.class);
+		assertNotNull(fooBean);
+		assertInstanceOf(Foo.class, fooBean);
 
-		assertNotNull(beanFactory.getBean(bar, Bar.class));
-		assertInstanceOf(Bar.class, beanFactory.getBean(bar, Bar.class));
+		Bar barBean = beanFactory.getBean(bar, Bar.class);
+		assertNotNull(barBean);
+		assertInstanceOf(Bar.class, barBean);
 
-		assertNotNull(beanFactory.getBean(baz, Baz.class));
-		assertInstanceOf(Baz.class, beanFactory.getBean(baz, Baz.class));
+		Baz bazBean = beanFactory.getBean(baz, Baz.class);
+		assertNotNull(bazBean);
+		assertInstanceOf(Baz.class, bazBean);
 	}
 
 	@Test
@@ -40,6 +46,8 @@ class BeanFactoryTest {
 		assertNotNull(beanFactory.getBean(Foo.class));
 		assertNotNull(beanFactory.getBean(Bar.class));
 		assertNotNull(beanFactory.getBean(Baz.class));
+
+		assertThrows(RuntimeException.class, () -> beanFactory.getBean(Bean.class));
 	}
 
 	// DI 기능 개발 후 테스트 통과 시키기

@@ -2,8 +2,9 @@ package org.blossomframework.core;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 // bean 의 조회 가능(type 지정 가능)
 public class BeanFactory {
@@ -15,44 +16,43 @@ public class BeanFactory {
 
 	public BeanFactory(Class<?>... configClasses) {
 		for (Class<?> configClass : configClasses) {
-			processConfigClass(configClass);
+			processRegisterBean(configClass);
 		}
 	}
 
 	// TODO: 2023-11-29 빈 팩토리에 저장 후 정렬 필요
-	private void processConfigClass(Class<?> configClass) {
+	// TODO: 2023-12-04 객체는 생성했으니, 조립을 해야지
+	private void processRegisterBean(Class<?> configClass) {
 		try {
 			if (configClass.isAnnotationPresent(Configuration.class)) {
-				Object configInstance = configClass.getDeclaredConstructor().newInstance();
-
-				String configurationBeanName = resolveConfigurationBeanName(configInstance);
-
-				beanDefinitions.put(configurationBeanName, new BeanDefinition(configurationBeanName, configClass, configInstance));
-
-				registerMethodBean(configClass, configInstance);
+				registerBeanClass(configClass);
+				registerFactoryBean(configClass);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	private void registerBeanClass(Class<?> configClass) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		Object configInstance = configClass.getDeclaredConstructor().newInstance();
+		String configurationBeanName = resolveConfigurationBeanName(configInstance);
+		beanDefinitions.put(configurationBeanName, new BeanDefinition(configurationBeanName, configClass, configInstance));
+	}
+
 	// TODO: 2023-11-29 팩토리 메서드의 파라미터 빈으로 등록되었는지 체크(이름, 타입 체크 필요)
+	// TODO: 2023-12-03 method bean 기본 등록 후 나중에 주입(조립)
+	// TODO: 2023-12-03 parent type 의 bean 등록
 	// TODO: 2023-11-29 DI 기능 개발
 	// TODO: 2023-11-29 configClass 와일드카드 타입이 아닌, 타입 파라미터 받아 저장하기
-	// TODO: 2023-12-03 parent type 의 bean 등록
-	// TODO: 2023-12-03 getBean 메서드 추상화 
-	private void registerMethodBean(Class<?> configClass, Object configInstance) throws IllegalAccessException, InvocationTargetException {
+	// TODO: 2023-12-03 getBean 메서드 추상화
+	private void registerFactoryBean(Class<?> configClass) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException {
 		for (Method method : configClass.getDeclaredMethods()) {
 			if (method.isAnnotationPresent(Bean.class)) {
 				String methodBeanName = method.getName();
 
-				//빈 팩토리 메서드의 파라미터가 빈에 등록되었는지
-//				Parameter[] parameters = method.getParameters();
-//				for (Parameter parameter : parameters) {
-//
-//				}
-
-				beanDefinitions.put(methodBeanName, new BeanDefinition(methodBeanName, method.getReturnType(), method.invoke(configInstance)));
+				Class<?> methodReturnType = method.getReturnType();
+				BeanDefinition methodBeanDefinition = new BeanDefinition(methodBeanName, methodReturnType, methodReturnType.getDeclaredConstructor().newInstance());
+				beanDefinitions.put(methodBeanName, methodBeanDefinition);
 			}
 		}
 	}

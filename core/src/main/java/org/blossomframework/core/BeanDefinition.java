@@ -1,43 +1,56 @@
 package org.blossomframework.core;
 
+import java.util.List;
+
 public class BeanDefinition {
 
-	private String beanName;
+	private String beanClassName;
+	private Class beanClass;
+	private String factoryBeanName;
+	private String factoryMethodBeanName;
 
-	private Class type;
-
-	private Object targetBean;
+	private List<String> beanPropertyNames;
 
 	public BeanDefinition() {
 	}
 
-	public BeanDefinition(String beanName, Class type, Object targetBean) {
-		this.beanName = beanName;
-		this.type = type;
-		this.targetBean = targetBean;
+	public Class getBeanClass() {
+		return beanClass;
 	}
 
-	public String getBeanName() {
-		return beanName;
+	public void setBeanClass(Class beanClass) {
+		this.beanClass = beanClass;
 	}
 
-	public void setBeanName(String beanName) {
-		this.beanName = beanName;
+	public String getBeanClassName() {
+		return beanClassName;
 	}
 
-	public Class getType() {
-		return type;
+	public void setBeanClassName(String beanClassName) {
+		this.beanClassName = beanClassName;
 	}
 
-	public void setType(Class type) {
-		this.type = type;
+	public String getFactoryBeanName() {
+		return factoryBeanName;
 	}
 
-	public Object getTargetBean() {
-		return targetBean;
+	public void setFactoryBeanName(String factoryBeanName) {
+		this.factoryBeanName = factoryBeanName;
 	}
 
-	public void setTargetBean(Object targetBean) {
-		this.targetBean = targetBean;
+	public String getFactoryMethodBeanName() {
+		return factoryMethodBeanName;
+	}
+
+	public void setFactoryMethodBeanName(String factoryMethodBeanName) {
+		this.factoryMethodBeanName = factoryMethodBeanName;
+	}
+
+	public List<String> getBeanPropertyNames() {
+		return beanPropertyNames;
+	}
+
+	public void setBeanPropertyNames(List<String> beanPropertyNames) {
+		this.beanPropertyNames = beanPropertyNames;
 	}
 }

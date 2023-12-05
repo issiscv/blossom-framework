@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
-// bean 의 조회 가능(type 지정 가능)
 public class BeanFactory {
 
 	private Map<String, BeanDefinition> beanDefinitions = new HashMap<>();
@@ -20,8 +19,6 @@ public class BeanFactory {
 		}
 	}
 
-	// TODO: 2023-11-29 빈 팩토리에 저장 후 정렬 필요
-	// TODO: 2023-12-04 beanDefinition 은 bean 의 생성에 필요한 metadata
 	private void processBeanDefinition(Class<?> configClass) {
 		try {
 			if (configClass.isAnnotationPresent(Configuration.class)) {
@@ -56,17 +53,13 @@ public class BeanFactory {
 		beanDefinitions.put(beanClassName, beanDefinition);
 	}
 
-	// TODO: 2023-12-03 parent type 의 bean 등록
-	// TODO: 2023-11-29 DI 기능 개발
-	// TODO: 2023-11-29 configClass 와일드카드 타입이 아닌, 타입 파라미터 받아 저장하기
-	// TODO: 2023-12-03 getBean 메서드 추상화
 	private void processFactoryMethodBean(Class<?> configClass) {
 		for (Method method : configClass.getDeclaredMethods()) {
 			if (method.isAnnotationPresent(Bean.class)) {
 				String methodBeanName = method.getName();
 				List<String> propertyNames = new ArrayList<>();
 
-				Class<?> factoryMethodBeanType = method.getReturnType();
+				Class<?> factoryMethodBeanType = method.getReturnType(); //팩토리 메서드, 빈의 반환 타입
 				Field[] declaredFields = factoryMethodBeanType.getDeclaredFields();
 				for (Field declaredField : declaredFields) {
 					propertyNames.add(declaredField.getName());
@@ -75,8 +68,8 @@ public class BeanFactory {
 				BeanDefinition beanDefinition = new BeanDefinition();
 				beanDefinition.setBeanClass(factoryMethodBeanType);
 				beanDefinition.setBeanClassName(resolveBeanName(factoryMethodBeanType));
-				beanDefinition.setFactoryBeanName(resolveBeanName(configClass));
-				beanDefinition.setFactoryMethodBeanName(method.getName());
+				beanDefinition.setFactoryBeanName(resolveBeanName(configClass)); //팩토리 빈의 이름
+				beanDefinition.setFactoryMethodBeanName(method.getName()); //팩토리 메서드의 이름
 				beanDefinition.setBeanPropertyNames(propertyNames);
 
 				beanDefinitions.put(methodBeanName, beanDefinition);
@@ -135,23 +128,13 @@ public class BeanFactory {
 	}
 
 //	public <T> T getBean(Class<T> requiredType) {
-//		Optional<T> beanIfExists = getBeanIfExists(requiredType);
-//		if (beanIfExists.isPresent()) {
-//			return beanIfExists.get();
-//		} else {
-//			throw new RuntimeException("No bean named '" + requiredType.getName() + "' is defined");
-//		}
-//
-//	}
-
-//	private <T> Optional<T> getBeanIfExists(Class<T> requiredType) {
 //		for (String beanName : beanDefinitions.keySet()) {
 //			BeanDefinition beanDefinition = beanDefinitions.get(beanName);
-//			if (beanDefinition.getType() == requiredType) {
-//				return Optional.ofNullable(requiredType.cast(beanDefinition.getTargetBean()));
+//			if (beanDefinition.getBeanClass() == requiredType) {
+//				getbean
+//				return requiredType.cast();
 //			}
 //		}
-//		return Optional.empty();
 //	}
 
 	private BeanDefinition getBeanDefinition(String name) {

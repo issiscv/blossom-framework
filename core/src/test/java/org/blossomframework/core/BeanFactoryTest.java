@@ -1,5 +1,6 @@
 package org.blossomframework.core;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,6 +41,16 @@ class BeanFactoryTest {
 		assertNotNull(bazBean);
 		assertInstanceOf(Baz.class, bazBean);
 	}
+
+	@Test
+	@DisplayName("Bean 객체가 의존성을 가진 객체가 Bean 이 아닐 경우")
+	void noRegisteredInBeanFactoryTest() throws Exception {
+		Baz beanCasted = (Baz) beanFactory.getBean(baz);
+		Object bean = beanFactory.getBean(baz);
+		assertNotNull(beanCasted);
+		assertInstanceOf(Baz.class, bean);
+	}
+
 
 //	@Test
 //	void getBeanByTypeTest() {
@@ -140,8 +151,18 @@ class BeanFactoryTest {
 
 	static class Baz {
 
+		private Boo boo;
+
 		public Baz() {
 		}
+
+		public Baz(Boo boo) {
+			this.boo = boo;
+		}
+	}
+
+	static class Boo {
+
 	}
 
 }

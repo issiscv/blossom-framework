@@ -15,11 +15,17 @@ public class BeanFactory {
 
 	public BeanFactory(Class<?>... configClasses) {
 		for (Class<?> configClass : configClasses) {
-			processBeanDefinition(configClass);
+			process(configClass);
+			refresh();
 		}
 	}
 
-	private void processBeanDefinition(Class<?> configClass) {
+	// TODO: 2023-12-06 bean 조립
+	private void refresh() {
+
+	}
+
+	private void process(Class<?> configClass) {
 		try {
 			if (configClass.isAnnotationPresent(Configuration.class)) {
 				processFactoryBeanClass(configClass);
@@ -87,6 +93,9 @@ public class BeanFactory {
 			return beanRegistry.get(name);
 		} else {
 			BeanDefinition beanDefinition = getBeanDefinition(name);
+			if (beanDefinition == null) {
+				return null;
+			}
 
 			try {
 				Class<?> beanClass = beanDefinition.getBeanClass();
@@ -138,11 +147,7 @@ public class BeanFactory {
 //	}
 
 	private BeanDefinition getBeanDefinition(String name) {
-		BeanDefinition beanDefinition = beanDefinitions.get(name);
-		if (beanDefinition == null) {
-			throw new RuntimeException("No bean named '" + name + "' is defined");
-		}
-		return beanDefinition;
+		return beanDefinitions.getOrDefault(name, null);
 	}
 
 

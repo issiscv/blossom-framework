@@ -3,7 +3,10 @@ package org.blossomframework.core;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class BeanFactory {
 
@@ -15,17 +18,18 @@ public class BeanFactory {
 
 	public BeanFactory(Class<?>... configClasses) {
 		for (Class<?> configClass : configClasses) {
-			process(configClass);
-			refresh();
+			register(configClass);
+		}
+		refresh();
+	}
+
+	private void refresh() {
+		for (String beanClassName : beanDefinitions.keySet()) {
+			registerBeanRegistry(beanClassName);
 		}
 	}
 
-	// TODO: 2023-12-06 bean 조립
-	private void refresh() {
-
-	}
-
-	private void process(Class<?> configClass) {
+	private void register(Class<?> configClass) {
 		try {
 			if (configClass.isAnnotationPresent(Configuration.class)) {
 				processFactoryBeanClass(configClass);
@@ -89,6 +93,10 @@ public class BeanFactory {
 	}
 
 	public Object getBean(String name) {
+		return beanRegistry.getOrDefault(name, null);
+	}
+
+	public Object registerBeanRegistry(String name) {
 		if (beanRegistry.containsKey(name)) {
 			return beanRegistry.get(name);
 		} else {
@@ -107,7 +115,7 @@ public class BeanFactory {
 					field.setAccessible(true); // private 필드에 접근하기 위해
 
 					String autowiredBeanName = resolveBeanName(field.getType());
-					Object autowiredBean = getBean(autowiredBeanName); // 의존성 빈 인스턴스
+					Object autowiredBean = registerBeanRegistry(autowiredBeanName); // 의존성 빈 인스턴스
 					field.set(bean, autowiredBean); // 의존성 주입
 				}
 
@@ -120,7 +128,6 @@ public class BeanFactory {
 			}
 		}
 	}
-
 
 
 	/**

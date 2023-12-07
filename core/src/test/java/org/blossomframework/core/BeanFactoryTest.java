@@ -61,6 +61,15 @@ class BeanFactoryTest {
 		assertNull(beanFactory.getBean(Bean.class));
 	}
 
+	@Test
+	void getBeanSingletonTest() {
+		Foo foo1 = beanFactory.getBean("foo", Foo.class);
+		Foo foo2 = beanFactory.getBean("foo", Foo.class);
+		assertSame(foo1, foo2);
+		assertSame(foo1.getBar(), foo2.getBar());
+		assertSame(foo1.getBar().getBaz(), foo2.getBar().getBaz());
+	}
+
 	// DI 기능 개발 후 테스트 통과 시키기
 //	@Test
 //	void DITest() {

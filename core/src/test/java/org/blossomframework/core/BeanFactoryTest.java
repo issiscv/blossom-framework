@@ -52,14 +52,14 @@ class BeanFactoryTest {
 	}
 
 
-//	@Test
-//	void getBeanByTypeTest() {
-//		assertNotNull(beanFactory.getBean(Foo.class));
-//		assertNotNull(beanFactory.getBean(Bar.class));
-//		assertNotNull(beanFactory.getBean(Baz.class));
-//
-//		assertThrows(RuntimeException.class, () -> beanFactory.getBean(Bean.class));
-//	}
+	@Test
+	void getBeanByTypeTest() {
+		assertNotNull(beanFactory.getBean(Foo.class));
+		assertNotNull(beanFactory.getBean(Bar.class));
+		assertNotNull(beanFactory.getBean(Baz.class));
+
+		assertNull(beanFactory.getBean(Bean.class));
+	}
 
 	// DI 기능 개발 후 테스트 통과 시키기
 //	@Test

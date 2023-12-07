@@ -30,13 +30,9 @@ public class BeanFactory {
 	}
 
 	private void register(Class<?> configClass) {
-		try {
-			if (configClass.isAnnotationPresent(Configuration.class)) {
-				processFactoryBeanClass(configClass);
-				processFactoryMethodBean(configClass);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (configClass.isAnnotationPresent(Configuration.class)) {
+			processFactoryBeanClass(configClass);
+			processFactoryMethodBean(configClass);
 		}
 	}
 
@@ -143,19 +139,19 @@ public class BeanFactory {
 		return requiredType.cast(this.getBean(name));
 	}
 
-//	public <T> T getBean(Class<T> requiredType) {
-//		for (String beanName : beanDefinitions.keySet()) {
-//			BeanDefinition beanDefinition = beanDefinitions.get(beanName);
-//			if (beanDefinition.getBeanClass() == requiredType) {
-//				getbean
-//				return requiredType.cast();
-//			}
-//		}
-//	}
+	public <T> T getBean(Class<T> requiredType) {
+		for (String beanName : beanDefinitions.keySet()) {
+			BeanDefinition beanDefinition = beanDefinitions.get(beanName);
+			if (beanDefinition.getBeanClass() == requiredType) {
+				return requiredType.cast(beanRegistry.get(beanDefinition.getBeanClassName()));
+			}
+		}
+
+		return null;
+	}
 
 	private BeanDefinition getBeanDefinition(String name) {
 		return beanDefinitions.getOrDefault(name, null);
 	}
-
 
 }

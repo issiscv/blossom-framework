@@ -169,6 +169,21 @@ public class BeanFactory {
 		return requiredType.cast(beanCandidates.stream().findAny().get());
 	}
 
+	public <T> Map<String, T> getBeansOfType(Class<T> type) {
+		Map<String, T> beansOfType = new HashMap<>();
+
+		for (Map.Entry<String, BeanDefinition> beanDefinitionEntry : beanDefinitions.entrySet()) {
+			BeanDefinition beanDefinition = beanDefinitionEntry.getValue();
+			if (type.isAssignableFrom(beanDefinition.getBeanClass())) {
+				String beanName = beanDefinitionEntry.getKey();
+				T beanOfType = type.cast(beanRegistry.get(beanName));
+				beansOfType.put(beanName, beanOfType);
+			}
+		}
+
+		return beansOfType;
+	}
+
 	private BeanDefinition getBeanDefinition(String name) {
 		return beanDefinitions.getOrDefault(name, null);
 	}

@@ -6,6 +6,8 @@ import org.blossomframework.beans.exception.NoSuchBeanDefinitionException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class BeanFactoryTest {
@@ -76,12 +78,12 @@ class BeanFactoryTest {
 		assertSame(foo1.getBar().getBaz(), foo2.getBar().getBaz());
 		assertNotSame(foo1, foo3);
 		assertNotSame(foo2, foo3);
-
 	}
 
 	@Test
-	void NoSuchBeanDefinitionExceptionTest() {
-		assertThrows(NoSuchBeanDefinitionException.class, () -> beanFactory.getBean(Foo.class));
+	void getBeansOfTypeTest() {
+		Map<String, Object> beansOfType = beanFactory.getBeansOfType(Object.class);
+		assertEquals(5, beansOfType.size());
 	}
 
 	// DI 기능 개발 후 테스트 통과 시키기
@@ -128,7 +130,15 @@ class BeanFactoryTest {
 
 	}
 
-	static class Foo {
+	interface SuperInterface {
+
+	}
+
+	static class SuperClass {
+
+	}
+
+	static class Foo extends SuperClass implements SuperInterface {
 
 		private Bar bar;
 		private Baz baz;
@@ -158,7 +168,7 @@ class BeanFactoryTest {
 		}
 	}
 
-	static class Bar {
+	static class Bar extends SuperClass implements SuperInterface {
 		private Baz baz;
 
 		public Bar() {
@@ -177,7 +187,7 @@ class BeanFactoryTest {
 		}
 	}
 
-	static class Baz {
+	static class Baz extends SuperClass implements SuperInterface {
 
 		private Boo boo;
 

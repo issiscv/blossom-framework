@@ -8,14 +8,12 @@
 
 > spring-core 에 해당한다.
 
-### feature
-업데이트 - 2023/12/05
-
 #### Feature
 - 설정 Class 기반 Bean 등록
 - Bean 의 이름, 타입으로 조회 기능
 - Dependency Injection
   - Setter 주입 기능
+- 싱글톤 기능
 
 #### Details 
 - 설정 Bean 클래스 등록 후 DI(refresh) 기능 
@@ -23,11 +21,22 @@
   - BeanDefinition, BeanRegistry 기능
     - BeanDefinition 은 Bean 의 Meta 정보 저장
     - BeanRegistry 은 BeanDefinition 을 기반으로 조립 후 생성된 Bean 저장소
+- NoSuchUniqueBeanException 예외 기능
+  - 찾고자 하느 Bean 이 여러개 또는 없을 경우 발생
 
 #### 추가 예정
-- 싱글톤 기능 확립
-- bean 조립 시 타입 이름이 아닌, 필드명으로 조립  
-- Parent Type 조회
+- getBeansOfType
+  - Bean 의 Type 으로 조회
+  - Parent Type 조회
+
+- Bean 의 Primary 이름 정하기
+  - Factory Method Bean 로 생성된 Bean 이름은 Method 로
+  - Bean 의 Field 는 Type, Field name 순으로 지정
+
+- BeanRegistry 전략적으로 분리
+- autowire 기능 추가
+- Bean Order 추가
+- Bean 조립 시 타입 이름이 아닌, 필드명으로 조립  
 - BeanRegistry 클래스 분리
 - DI 전략 추가
   - 생성자 주입, 필드 주입

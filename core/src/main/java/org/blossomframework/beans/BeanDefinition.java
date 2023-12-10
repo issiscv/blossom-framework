@@ -1,4 +1,4 @@
-package org.blossomframework.core;
+package org.blossomframework.beans;
 
 import java.util.List;
 

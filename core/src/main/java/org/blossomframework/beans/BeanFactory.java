@@ -1,4 +1,8 @@
-package org.blossomframework.core;
+package org.blossomframework.beans;
+
+import org.blossomframework.beans.annotation.Autowire;
+import org.blossomframework.beans.annotation.Bean;
+import org.blossomframework.beans.annotation.Configuration;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

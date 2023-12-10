@@ -1,5 +1,7 @@
-package org.blossomframework.core;
+package org.blossomframework.beans;
 
+import org.blossomframework.beans.annotation.Bean;
+import org.blossomframework.beans.annotation.Configuration;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -65,9 +67,25 @@ class BeanFactoryTest {
 	void getBeanSingletonTest() {
 		Foo foo1 = beanFactory.getBean("foo", Foo.class);
 		Foo foo2 = beanFactory.getBean("foo", Foo.class);
+		Foo foo3 = beanFactory.getBean("fooDuplicated", Foo.class);
+
 		assertSame(foo1, foo2);
 		assertSame(foo1.getBar(), foo2.getBar());
 		assertSame(foo1.getBar().getBaz(), foo2.getBar().getBaz());
+		assertNotSame(foo1, foo3);
+		assertNotSame(foo2, foo3);
+
+	}
+
+	@Test
+	void BeanFactoryTest() {
+		Foo foo1 = beanFactory.getBean(Foo.class);
+
+		Foo foo2 = beanFactory.getBean("foo", Foo.class);
+		Foo foo3 = beanFactory.getBean("fooDuplicated", Foo.class);
+
+		assertSame(foo1, foo2);
+		assertSame(foo1, foo3);
 	}
 
 	// DI 기능 개발 후 테스트 통과 시키기
@@ -94,6 +112,11 @@ class BeanFactoryTest {
 
 		@Bean
 		public Foo foo() {
+			return new Foo(bar(), baz());
+		}
+
+		@Bean
+		public Foo fooDuplicated() {
 			return new Foo(bar(), baz());
 		}
 

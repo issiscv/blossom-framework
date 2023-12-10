@@ -2,6 +2,7 @@ package org.blossomframework.beans;
 
 import org.blossomframework.beans.annotation.Bean;
 import org.blossomframework.beans.annotation.Configuration;
+import org.blossomframework.beans.exception.NoSuchBeanDefinitionException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +28,8 @@ class BeanFactoryTest {
 		Object bazBean = beanFactory.getBean(baz);
 		assertNotNull(bazBean);
 		assertInstanceOf(Baz.class, bazBean);
+
+		assertThrows(NoSuchBeanDefinitionException.class, () -> beanFactory.getBean("elelele"));
 	}
 
 	@Test
@@ -56,11 +59,10 @@ class BeanFactoryTest {
 
 	@Test
 	void getBeanByTypeTest() {
-		assertNotNull(beanFactory.getBean(Foo.class));
+		assertThrows(NoSuchBeanDefinitionException.class, () -> beanFactory.getBean(Foo.class));
 		assertNotNull(beanFactory.getBean(Bar.class));
 		assertNotNull(beanFactory.getBean(Baz.class));
-
-		assertNull(beanFactory.getBean(Bean.class));
+		assertThrows(NoSuchBeanDefinitionException.class, () -> beanFactory.getBean(Bean.class));
 	}
 
 	@Test
@@ -78,14 +80,8 @@ class BeanFactoryTest {
 	}
 
 	@Test
-	void BeanFactoryTest() {
-		Foo foo1 = beanFactory.getBean(Foo.class);
-
-		Foo foo2 = beanFactory.getBean("foo", Foo.class);
-		Foo foo3 = beanFactory.getBean("fooDuplicated", Foo.class);
-
-		assertSame(foo1, foo2);
-		assertSame(foo1, foo3);
+	void NoSuchBeanDefinitionExceptionTest() {
+		assertThrows(NoSuchBeanDefinitionException.class, () -> beanFactory.getBean(Foo.class));
 	}
 
 	// DI 기능 개발 후 테스트 통과 시키기

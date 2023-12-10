@@ -3,6 +3,7 @@ package org.blossomframework.beans;
 import org.blossomframework.beans.annotation.Autowire;
 import org.blossomframework.beans.annotation.Bean;
 import org.blossomframework.beans.annotation.Configuration;
+import org.blossomframework.beans.exception.NoSuchBeanDefinitionException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -93,7 +94,12 @@ public class BeanFactory {
 	}
 
 	public Object getBean(String name) {
-		return beanRegistry.getOrDefault(name, null);
+		Object bean = beanRegistry.get(name);
+		if (bean == null) {
+			throw new NoSuchBeanDefinitionException("No Such BeanDefinitions");
+		} else {
+			return bean;
+		}
 	}
 
 	public Object registerBeanRegistry(String name) {
@@ -144,14 +150,23 @@ public class BeanFactory {
 	}
 
 	public <T> T getBean(Class<T> requiredType) {
+		List<Object> beanCandidates = new ArrayList<>();
 		for (String beanName : beanDefinitions.keySet()) {
 			BeanDefinition beanDefinition = beanDefinitions.get(beanName);
 			if (beanDefinition.getBeanClass() == requiredType) {
-				return requiredType.cast(beanRegistry.get(beanDefinition.getBeanClassName()));
+				beanCandidates.add(beanRegistry.get(beanDefinition.getBeanClassName()));
 			}
 		}
 
-		return null;
+		// TODO: 2023-12-10 primary, order 기능 추가
+
+		if (beanCandidates.size() >= 2) {
+			throw new NoSuchBeanDefinitionException("No unique BeanDefinitions");
+		} else if (beanCandidates.size() == 0) {
+			throw new NoSuchBeanDefinitionException("No Such BeanDefinitions");
+		}
+
+		return requiredType.cast(beanCandidates.stream().findAny().get());
 	}
 
 	private BeanDefinition getBeanDefinition(String name) {

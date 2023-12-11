@@ -93,15 +93,6 @@ public class BeanFactory {
 		return simpleName.substring(0, 1).toLowerCase() + simpleName.substring(1);
 	}
 
-	public Object getBean(String name) {
-		Object bean = beanRegistry.get(name);
-		if (bean == null) {
-			throw new NoSuchBeanDefinitionException("No Such BeanDefinitions");
-		} else {
-			return bean;
-		}
-	}
-
 	public Object registerBeanRegistry(String name) {
 		if (beanRegistry.containsKey(name)) {
 			return beanRegistry.get(name);
@@ -135,6 +126,15 @@ public class BeanFactory {
 		}
 	}
 
+	public Object getBean(String name) {
+		Object bean = beanRegistry.get(name);
+		if (bean == null) {
+			throw new NoSuchBeanDefinitionException("No Such BeanDefinitions");
+		} else {
+			return bean;
+		}
+	}
+
 
 	/**
 	 * 지정된 이름과 타입에 해당하는 빈(bean)을 검색하고 반환합니다.
@@ -149,6 +149,14 @@ public class BeanFactory {
 		return requiredType.cast(this.getBean(name));
 	}
 
+	/**
+	 * 지정된 타입에 해당하는 빈(bean)을 검색하고 반환합니다.
+	 * 이 메서드는 컨테이너에서 빈의 타입으로 찾은 후, 요청된 타입으로 캐스팅합니다.
+	 *
+	 * @param requiredType 반환할 빈의 예상 타입. 이 타입으로 빈이 캐스팅됩니다.
+	 * @param <T>          제네릭 타입 매개변수. 반환될 빈의 타입을 지정합니다.
+	 * @return 타입에 해당하는 빈. 존재하지 않거나 타입이 일치하지 않는 경우 예외가 발생할 수 있습니다.
+	 */
 	public <T> T getBean(Class<T> requiredType) {
 		List<Object> beanCandidates = new ArrayList<>();
 		for (String beanName : beanDefinitions.keySet()) {
@@ -169,14 +177,22 @@ public class BeanFactory {
 		return requiredType.cast(beanCandidates.stream().findAny().get());
 	}
 
-	public <T> Map<String, T> getBeansOfType(Class<T> type) {
+	/**
+	 * 지정된 super 타입에 해당하는 빈(bean) 을 검색하고 Map 으로 반환합니다.
+	 * 이 메서드는 컨테이너에서 super 타입에 해당하는 모든 빈(bean) 을 검색하고, 요청된 타입으로 캐스팅합니다.
+	 *
+	 * @param requiredType 반환할 빈의 super 타입.
+	 * @param <T>          제네릭 타입 매개변수. 반환될 빈의 타입을 지정합니다.
+	 * @return 반환할 빈의 super 타입의 쌍을 Map 으로 반환 (빈 이름 - 빈 객체)
+	 */
+	public <T> Map<String, T> getBeansOfType(Class<T> requiredType) {
 		Map<String, T> beansOfType = new HashMap<>();
 
 		for (Map.Entry<String, BeanDefinition> beanDefinitionEntry : beanDefinitions.entrySet()) {
 			BeanDefinition beanDefinition = beanDefinitionEntry.getValue();
-			if (type.isAssignableFrom(beanDefinition.getBeanClass())) {
+			if (requiredType.isAssignableFrom(beanDefinition.getBeanClass())) {
 				String beanName = beanDefinitionEntry.getKey();
-				T beanOfType = type.cast(beanRegistry.get(beanName));
+				T beanOfType = requiredType.cast(beanRegistry.get(beanName));
 				beansOfType.put(beanName, beanOfType);
 			}
 		}
